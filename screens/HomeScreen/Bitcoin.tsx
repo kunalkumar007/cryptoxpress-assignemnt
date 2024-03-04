@@ -1,21 +1,11 @@
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { reaction } from "mobx";
 import React, { useEffect, useState } from "react";
 import { FlatList, Image, Text, View } from "react-native";
 import { ScaledSheet } from "react-native-size-matters";
 import Button from "../../components/Button";
 import walletStore from "../../store/WalletStore";
-import { RootStackParamList } from "../../types/navigator.types";
 import { Market } from "../../types/market.types";
-
-const data = {
-  id: "bd7acbea-c1b1-46c2-aed5-3ad53abb28ba",
-  fullName: "Bitcoin",
-  timeStamp: "$1245.00",
-  recentText: "BTC",
-  avatarUrl:
-    "https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500",
-};
+import { RootStackParamList } from "../../types/navigator.types";
 
 type Props = NativeStackScreenProps<RootStackParamList, "Home">;
 
@@ -79,6 +69,7 @@ export default function Bitcoin({ navigation }: Props) {
         showsVerticalScrollIndicator={false}
         bounces={false}
         data={marketPrice}
+        ListEmptyComponent={<Text style={styles.heading}>Nothing Found</Text>}
         renderItem={({ item }) => (
           <View style={styles.item}>
             <Image source={{ uri: item.image }} style={styles.avatar} />
@@ -171,5 +162,11 @@ const styles = ScaledSheet.create({
     width: "100%",
     textAlign: "center",
     fontWeight: "bold",
+  },
+  heading: {
+    fontSize: 24,
+    fontWeight: "bold",
+    textAlign: "center",
+    marginTop: "50%",
   },
 });
