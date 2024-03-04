@@ -6,6 +6,7 @@ import { RootStackParamList } from "../../types/navigator.types";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { reaction } from "mobx";
 import walletStore from "../../store/WalletStore";
+import { Market } from "../../types/market.types";
 
 const data = {
   id: "bd7acbea-c1b1-46c2-aed5-3ad53abb28ba",
@@ -20,22 +21,31 @@ type Props = NativeStackScreenProps<RootStackParamList, "Home">;
 
 export default function Polygon({ navigation }: Props) {
   const [usdtPrice, setUsdtPrice] = useState(null);
+  const [marketPrice, setmarketPrice] = useState<Market[]>([]);
+
+  // useEffect(() => {
+  //   const unsubscribe = reaction(
+  //     () => walletStore.network,
+  //     () => {
+  //       fetchPrices();
+  //     }
+  //   );
+  //   return () => unsubscribe();
+  // }, [walletStore.network]);
 
   useEffect(() => {
-    const unsubscribe = reaction(
-      () => walletStore.network,
-      () => {
-        fetchPrices();
-      }
-    );
-    return () => unsubscribe();
-  }, [walletStore.network]);
+    fetchPrices();
+  }, []);
 
   const fetchPrices = async () => {
     try {
       const usdtResponse = await fetch(walletStore.getUsdtPriceEndpoint());
       const usdtData = await usdtResponse.json();
-      setUsdtPrice(usdtData.price);
+      setUsdtPrice(usdtData.tether.usd);
+
+      const marketResponse = await fetch(walletStore.getMarketPrices());
+      const marketData = await marketResponse.json();
+      setmarketPrice(marketData);
     } catch (error) {
       console.error("Error fetching prices:", error);
       alert("An error occurred while fetching prices.");
@@ -46,7 +56,7 @@ export default function Polygon({ navigation }: Props) {
     <View style={styles.container}>
       <View style={styles.priceContainer}>
         <Text style={styles.subtitle}>Current Polygon Price</Text>
-        <Text style={styles.price}>$214.50</Text>
+        <Text style={styles.price}>${usdtPrice ?? "0"}</Text>
         <Text style={styles.subtitle}>+3.14%</Text>
       </View>
       <View style={styles.flexBox}>
@@ -66,15 +76,15 @@ export default function Polygon({ navigation }: Props) {
       <FlatList
         showsVerticalScrollIndicator={false}
         bounces={false}
-        data={new Array(15).fill(data).flat()}
+        data={marketPrice}
         renderItem={({ item }) => (
           <View style={styles.item}>
-            <Image source={{ uri: item.avatarUrl }} style={styles.avatar} />
+            <Image source={{ uri: item.image }} style={styles.avatar} />
             <View style={styles.content}>
-              <Text style={styles.fullName}>{item.fullName}</Text>
-              <Text style={styles.recentText}>{item.recentText}</Text>
+              <Text style={styles.fullName}>{item.name}</Text>
+              <Text style={styles.recentText}>{item.symbol}</Text>
             </View>
-            <Text style={styles.timeStamp}>{item.timeStamp}</Text>
+            <Text style={styles.timeStamp}>{item.current_price}</Text>
           </View>
         )}
       />

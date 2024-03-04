@@ -6,6 +6,7 @@ import { ScaledSheet } from "react-native-size-matters";
 import Button from "../../components/Button";
 import walletStore from "../../store/WalletStore";
 import { RootStackParamList } from "../../types/navigator.types";
+import { Market } from "../../types/market.types";
 
 const data = {
   id: "bd7acbea-c1b1-46c2-aed5-3ad53abb28ba",
@@ -20,16 +21,21 @@ type Props = NativeStackScreenProps<RootStackParamList, "Home">;
 
 export default function Bitcoin({ navigation }: Props) {
   const [bitcoinPrice, setBitcoinPrice] = useState(null);
+  const [marketPrice, setmarketPrice] = useState<Market[]>([]);
+
+  // useEffect(() => {
+  //   const unsubscribe = reaction(
+  //     () => walletStore.network,
+  //     () => {
+  //       fetchPrices();
+  //     }
+  //   );
+  //   return () => unsubscribe();
+  // }, [walletStore.network]);
 
   useEffect(() => {
-    const unsubscribe = reaction(
-      () => walletStore.network,
-      () => {
-        fetchPrices();
-      }
-    );
-    return () => unsubscribe();
-  }, [walletStore.network]);
+    fetchPrices();
+  }, []);
 
   const fetchPrices = async () => {
     try {
@@ -37,7 +43,11 @@ export default function Bitcoin({ navigation }: Props) {
         walletStore.getBitcoinPriceEndpoint()
       );
       const bitcoinData = await bitcoinResponse.json();
-      setBitcoinPrice(bitcoinData.price);
+      setBitcoinPrice(bitcoinData.bitcoin.usd);
+
+      const marketResponse = await fetch(walletStore.getMarketPrices());
+      const marketData = await marketResponse.json();
+      setmarketPrice(marketData);
     } catch (error) {
       console.error("Error fetching prices:", error);
       alert("An error occurred while fetching prices.");
@@ -48,24 +58,35 @@ export default function Bitcoin({ navigation }: Props) {
     <View style={styles.container}>
       <View style={styles.priceContainer}>
         <Text style={styles.subtitle}>Current Bitcoin Price</Text>
-        <Text style={styles.price}>$214.50</Text>
+        <Text style={styles.price}>${bitcoinPrice ?? "0"}</Text>
         <Text style={styles.subtitle}>+3.14%</Text>
       </View>
-      <Button onPress={() => navigation.navigate("TransactionHistory")}>
-        <Text style={styles.buttonText}>Show History</Text>
-      </Button>
+      <View style={styles.flexBox}>
+        <Button
+          style={styles.btnStyle}
+          onPress={() => navigation.navigate("SendTransaction")}
+        >
+          <Text style={styles.buttonText}>Send</Text>
+        </Button>
+        <Button
+          style={styles.btnStyle}
+          onPress={() => navigation.navigate("TransactionHistory")}
+        >
+          <Text style={styles.buttonText}>History</Text>
+        </Button>
+      </View>
       <FlatList
         showsVerticalScrollIndicator={false}
         bounces={false}
-        data={new Array(15).fill(data).flat()}
+        data={marketPrice}
         renderItem={({ item }) => (
           <View style={styles.item}>
-            <Image source={{ uri: item.avatarUrl }} style={styles.avatar} />
+            <Image source={{ uri: item.image }} style={styles.avatar} />
             <View style={styles.content}>
-              <Text style={styles.fullName}>{item.fullName}</Text>
-              <Text style={styles.recentText}>{item.recentText}</Text>
+              <Text style={styles.fullName}>{item.name}</Text>
+              <Text style={styles.recentText}>{item.symbol}</Text>
             </View>
-            <Text style={styles.timeStamp}>{item.timeStamp}</Text>
+            <Text style={styles.timeStamp}>{item.current_price}</Text>
           </View>
         )}
       />
@@ -96,6 +117,10 @@ const styles = ScaledSheet.create({
     elevation: 5,
     margin: 10,
     padding: 20,
+  },
+  btnStyle: {
+    flex: 1,
+    margin: 1,
   },
   cardTitle: {
     width: "100%",

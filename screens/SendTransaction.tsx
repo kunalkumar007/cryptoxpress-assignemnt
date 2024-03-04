@@ -7,6 +7,7 @@ import Button from "../components/Button";
 import Input from "../components/Input";
 import walletStore from "../store/WalletStore";
 import { RootStackParamList } from "../types/navigator.types";
+import { validate } from "bitcoin-address-validation";
 
 type Props = NativeStackScreenProps<RootStackParamList, "SendTransaction">;
 
@@ -25,19 +26,32 @@ const SendTransaction = ({ navigation }: Props) => {
       return;
     }
 
-    if (!validateAddress(receiverAddress, walletStore.network)) {
+    if (validate(receiverAddress) === false) {
       alert("Invalid receiver address.");
       return;
     }
 
     try {
-      await walletStore.sendTransaction(receiverAddress, amount);
+      const responseData: any = await walletStore.sendTransaction(
+        receiverAddress,
+        amount
+      );
+
+      const transaction = {
+        id: Math.random(),
+        status: "Pending",
+        amount,
+        receiver: receiverAddress,
+        transactionLink: responseData.tx.hash,
+        fee: responseData.fees || 0,
+      };
+      walletStore.transactionHistory.unshift(transaction);
       alert("Transaction sent successfully!");
       setReceiverAddress("");
       setAmount("");
       navigation.goBack();
-    } catch (error) {
-      console.error("Error sending transaction:", error);
+    } catch (error: any) {
+      console.error("Error sending transaction:");
       alert("An error occurred while sending the transaction.");
     }
   };

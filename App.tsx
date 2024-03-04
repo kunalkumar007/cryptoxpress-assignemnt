@@ -14,7 +14,7 @@ export default function App() {
     <NavigationContainer ref={navigationRef}>
       <Stack.Navigator
         screenOptions={{ headerShown: false }}
-        // initialRouteName="SendTransaction"
+        // initialRouteName="Home"
       >
         <Stack.Screen
           name="WalletSelection"
