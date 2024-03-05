@@ -13,17 +13,7 @@ function MyTabs({ navigation }: { navigation: any }) {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.container}>
-        <View style={styles.flexBox}>
-          <Heading text="Wallet" />
-          <View style={styles.iconBox}>
-            <Feather
-              name="send"
-              size={24}
-              color="black"
-              onPress={() => navigation.navigate("SendTransaction")}
-            />
-          </View>
-        </View>
+        <Heading text="Wallet" />
         <Tab.Navigator>
           <Tab.Screen name="Bitcoin" component={Bitcoin} />
           <Tab.Screen name="Polygon" component={Polygon} />

@@ -36,7 +36,6 @@ const SendTransaction = ({ navigation }: Props) => {
         receiverAddress,
         amount
       );
-
       const transaction = {
         id: Math.random(),
         status: "Pending",
@@ -49,10 +48,11 @@ const SendTransaction = ({ navigation }: Props) => {
       alert("Transaction sent successfully!");
       setReceiverAddress("");
       setAmount("");
-      navigation.goBack();
     } catch (error: any) {
-      console.error("Error sending transaction:");
-      alert("An error occurred while sending the transaction.");
+      // alert("An error occurred while sending the transaction.");
+      console.log(error);
+    } finally {
+      navigation.goBack();
     }
   };
 

@@ -55,10 +55,11 @@ class WalletStore {
         },
       ],
     };
-    const apiEndpoint =
-      this.network === "bitcoin"
-        ? "https://api.blockcypher.com/v1/btc/test3/txs/send"
-        : "https://api.blockcypher.com/v1/eth/main/txs/push";
+    // const apiEndpoint =
+    //   this.network === "bitcoin"
+    //     ? "https://api.blockcypher.com/v1/btc/test3/txs/send"
+    //     : "https://api.blockcypher.com/v1/eth/main/txs/push";
+    const apiEndpoint = "https://api.blockcypher.com/v1/bcy/test/txs/new";
 
     // Make the API request to send the transaction using fetch
     const response = await fetch(apiEndpoint, {
@@ -70,17 +71,6 @@ class WalletStore {
     });
     const responseData = await response.json();
     return responseData;
-    // Simulate updating transaction history
-    // const transaction = {
-    //   id: Math.random(),
-    //   status: "Pending",
-    //   amount,
-    //   receiver: receiverAddress,
-    //   transactionLink: responseData.tx.hash,
-    //   fee: responseData.fees || 0,
-    // };
-
-    // this.transactionHistory.unshift(transaction);
   }
 
   getBitcoinPriceEndpoint() {

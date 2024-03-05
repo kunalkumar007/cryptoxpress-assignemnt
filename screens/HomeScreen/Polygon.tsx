@@ -13,6 +13,17 @@ export default function Polygon({ navigation }: Props) {
   const [usdtPrice, setUsdtPrice] = useState(null);
   const [marketPrice, setmarketPrice] = useState<Market[]>([]);
 
+  const onPolygonTabFocus = () => {
+    walletStore.setNetwork("polygon");
+  };
+
+  useEffect(() => {
+    const unsubscribeFocus = navigation.addListener("focus", onPolygonTabFocus);
+    return () => {
+      unsubscribeFocus();
+    };
+  }, [navigation]);
+
   // useEffect(() => {
   //   const unsubscribe = reaction(
   //     () => walletStore.network,

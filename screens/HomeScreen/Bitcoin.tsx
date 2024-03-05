@@ -13,6 +13,17 @@ export default function Bitcoin({ navigation }: Props) {
   const [bitcoinPrice, setBitcoinPrice] = useState(null);
   const [marketPrice, setmarketPrice] = useState<Market[]>([]);
 
+  const onBitcoinTabFocus = () => {
+    walletStore.setNetwork("bitcoin");
+  };
+
+  useEffect(() => {
+    const unsubscribeFocus = navigation.addListener("focus", onBitcoinTabFocus);
+    return () => {
+      unsubscribeFocus();
+    };
+  }, [navigation]);
+
   // useEffect(() => {
   //   const unsubscribe = reaction(
   //     () => walletStore.network,
